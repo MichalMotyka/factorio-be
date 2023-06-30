@@ -1,8 +1,10 @@
 package com.example.factorio.repository;
 
+import com.example.factorio.model.Document;
 import com.example.factorio.model.Product;
 import com.example.factorio.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.Collection;
 import java.util.List;
@@ -15,4 +17,5 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
     List<Product> findByNameContainingIgnoreCaseOrCategoryContainingIgnoreCase(String search, String search1);
     List<Product> findByActiveAndNameContainingIgnoreCaseOrCategoryContainingIgnoreCase(boolean active,String search, String search1);
     List<Product> findByAuthorAndActive(User user, Boolean active);
+
 }

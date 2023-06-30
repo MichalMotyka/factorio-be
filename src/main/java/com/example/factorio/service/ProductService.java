@@ -28,9 +28,9 @@ public class ProductService {
         return new ProductResponse(productDb.getId());
     }
 
-    public Product findProductByIdOrName(String id, String name) {
+    public Product findProductByIdOrName(Long id, String name) {
         if (id !=null){
-          return productRepository.findById(Long.parseLong(id)).orElseThrow();
+          return productRepository.findById(id).orElseThrow();
         }
         return productRepository.findByName(name).orElseThrow();
     }

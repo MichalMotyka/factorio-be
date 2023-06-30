@@ -35,7 +35,7 @@ public class ProductMediator {
     }
 
     public ProductExtended findProduct(String id, String name) {
-        Product product = productService.findProductByIdOrName(id,name);
+        Product product = productService.findProductByIdOrName(Long.valueOf(id),name);
         return productToProductExtended.toProductExtended(product);
     }
 
