@@ -36,10 +36,26 @@ public class DocumentService {
     private final DocumentToDocumentDTO documentDTO;
     private final ProductExtendedToProduct productExtendedToProduct;
     private final ProductService productService;
+    private final EmailService emailService;
+    private final OrderService orderService;
     private final JwtService jwtService;
 
     public Document createDocument(DocumentDTO documentDTO, String header) {
         Document document = documentDTOToDocument.toDocument(documentDTO);
+
+        if (document.getDocumentType() == DocumentType.ZAM){
+
+            Order order = orderService.createOrder(document.getOrder());
+            document.setOrder(order);
+
+            DocumentDTO documentWM = DocumentDTO.builder()
+                    .productList(documentDTO.getProductList())
+                    .documentType(DocumentType.WM)
+                    .description(" ")
+                    .build();
+
+            document.setRelatedDocument(createDocument(documentWM, header));
+        }
 
         LocalDate localDate = LocalDate.now();
         document.setCreateDate(localDate);
@@ -65,10 +81,19 @@ public class DocumentService {
         document.setUser(user);
         document = documentRepository.saveAndFlush(document);
 
+
         Document finalDocument = document;
         documentDTO.getProductList().forEach(value->{
             addProductToDocument(value,finalDocument);
         });
+
+        if (document.getDocumentType() == DocumentType.ZAM){
+            documentRepository.findById(document.getRelatedDocument().getId()).ifPresent(value->{
+                value.setDescription("Wydanie magazynowe utworzone na podstawie zamówienia "+ finalDocument.getUid());
+                documentRepository.save(value);
+            });
+
+        }
 
         return document;
     }
@@ -85,6 +110,12 @@ public class DocumentService {
         Document document = documentRepository.findByUid(id).orElse(null);
         if (document != null){
             if (document.getStatus() == Status.PROJECT){
+                if (document.getDocumentType() == DocumentType.ZAM){
+                    emailService.sendEmailToCustomer(document);
+                    //TODO SEND MAIL
+                    //TODO VALIDATE TRANSACTION
+                    manageOrder(document);
+                }
                 document.setStatus(Status.NEW);
             }else if (document.getStatus() == Status.NEW){
                 document.setStatus(Status.INPROGRES);
@@ -117,9 +148,16 @@ public class DocumentService {
             }
         });
     }
+    private boolean manageOrder(Document document){
+        settleProducts(document.getRelatedDocument());
+        Document documentWM = document.getRelatedDocument();
+        documentWM.setStatus(Status.COMPLETE);
+        documentRepository.save(documentWM);
+        return true;
+    }
 
     public Set<Document> getDocuments(Status status, DocumentType type, String search) {
-        StringBuilder sqlQuery = new StringBuilder("SELECT d1_0.id,d1_0.author,d1_0.createdate,d1_0.description,d1_0.documenttype,d1_0.enddate,d1_0.status,d1_0.uid from document d1_0");
+        StringBuilder sqlQuery = new StringBuilder("SELECT d1_0.id,d1_0.author,d1_0.createdate,d1_0.description,d1_0.documenttype,d1_0.enddate,d1_0.status,d1_0.uid,d1_0.relateddocument,d1_0.orderdoc from document d1_0");
         if (status != null || type != null || (search != null && !search.equals(""))) {
             sqlQuery.append(" where");
             boolean toNext = false;

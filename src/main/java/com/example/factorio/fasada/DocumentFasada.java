@@ -5,6 +5,7 @@ import com.example.factorio.model.Document;
 import com.example.factorio.model.DocumentDTO;
 import com.example.factorio.model.DocumentType;
 import com.example.factorio.model.Status;
+import com.example.factorio.service.EmailService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -21,6 +22,7 @@ import java.util.Set;
 public class DocumentFasada {
 
     private final DocumentMediator documentMediator;
+    private final EmailService emailService;
 
     @RequestMapping(method = RequestMethod.POST, value = "/create")
     public ResponseEntity<?> createDocument(

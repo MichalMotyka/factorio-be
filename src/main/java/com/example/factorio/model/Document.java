@@ -3,6 +3,8 @@ package com.example.factorio.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+
 import java.time.LocalDate;
 
 
@@ -11,6 +13,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @Entity
 @Table
+@ToString
+@SuperBuilder
 public class Document {
     @Id
     @GeneratedValue(generator = "document_id_seq",strategy=GenerationType.SEQUENCE)
@@ -31,4 +35,10 @@ public class Document {
     @JoinColumn(name = "author")
     private User user;
     private String description;
+    @ManyToOne
+    @JoinColumn(name = "orderdoc")
+    private Order order;
+    @ManyToOne
+    @JoinColumn(name = "relateddocument")
+    private Document relatedDocument;
 }

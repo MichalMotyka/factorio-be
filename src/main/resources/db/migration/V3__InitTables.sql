@@ -8,5 +8,7 @@ CREATE TABLE Document
     description  VARCHAR(255),
     status       VARCHAR,
     documentType varchar,
-    FOREIGN KEY (author) REFERENCES users (id)
+    FOREIGN KEY (author) REFERENCES users (id),
+    relatedDocument integer REFERENCES "document" (id),
+    "orderdoc"       integer REFERENCES "orders" (id)
 );
