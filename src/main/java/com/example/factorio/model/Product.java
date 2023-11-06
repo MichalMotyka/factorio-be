@@ -4,6 +4,7 @@ package com.example.factorio.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "product")
+@EqualsAndHashCode
 public class Product{
     @Id
     @GeneratedValue(generator = "product_id_seq",strategy=GenerationType.SEQUENCE)

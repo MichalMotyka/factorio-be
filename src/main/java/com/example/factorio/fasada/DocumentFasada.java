@@ -36,6 +36,18 @@ public class DocumentFasada {
         return ResponseEntity.status(400).build();
     }
 
+    @RequestMapping(method = RequestMethod.PUT, value = "/update")
+    public ResponseEntity<?> updateDocument(
+            @RequestBody DocumentDTO document,
+            HttpServletRequest request
+    ){
+        Document result = documentMediator.updateDocument(document,request.getHeader(HttpHeaders.AUTHORIZATION));
+        if (result != null){
+            return ResponseEntity.ok(result);
+        }
+        return ResponseEntity.status(400).build();
+    }
+
     @RequestMapping(method = RequestMethod.GET, value = "/get")
     public ResponseEntity<?> getDocument(
             @RequestParam(required = false) Status status,

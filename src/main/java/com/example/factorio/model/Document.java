@@ -35,7 +35,7 @@ public class Document {
     @JoinColumn(name = "author")
     private User user;
     private String description;
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "orderdoc")
     private Order order;
     @ManyToOne

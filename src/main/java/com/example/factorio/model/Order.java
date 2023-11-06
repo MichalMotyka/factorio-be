@@ -1,11 +1,9 @@
 package com.example.factorio.model;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "orders")
@@ -13,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class Order {
     @Id
     @GeneratedValue(generator = "orders_id_seq",strategy= GenerationType.SEQUENCE)
@@ -31,8 +30,10 @@ public class Order {
     private String phone;
     private String description;
     private Deliver deliver;
+    @JsonProperty
     @Column(name = "cod")
     private boolean COD;
+    @JsonProperty
     @Column(name = "isfacture")
     private boolean isFacture;
 }

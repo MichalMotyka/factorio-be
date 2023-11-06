@@ -145,6 +145,11 @@ public class DocumentService {
                     throw new RuntimeException("Brak wystarczającej liczby produktu "+product.getName()+" "+product.getId());
                 }
                 product.setQuantity(product.getQuantity()-value.getQuantity());
+                if (product.getQuantity() == 0){
+                    product.setAccessibility(false);
+                }else {
+                    product.setAccessibility(true);
+                }
             }
         });
     }
@@ -217,5 +222,11 @@ public class DocumentService {
         });
 
         return productList;
+    }
+
+    public Document updateDocument(Document document,String header) {
+        User user = userRepository.findByLogin(jwtService.extractUsername(header)).orElseThrow();
+        document.setUser(user);
+        return documentRepository.saveAndFlush(document);
     }
 }

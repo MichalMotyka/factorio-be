@@ -18,6 +18,7 @@ import java.util.Set;
 public class DocumentMediator {
     private final DocumentService documentService;
     private final DocumentToDocumentDTO documentToDocumentDTO;
+    private final DocumentDTOToDocument documentDTOToDocument;
     private final ProductToProductExtended productToProductExtended;
     private final UserToUserDTO userToUserDTO;
 
@@ -47,5 +48,10 @@ public class DocumentMediator {
        documentDTO.setProductList(productExtendeds);
        documentDTO.setAuthor(userToUserDTO.toUserDTO(document.getUser()));
        return documentDTO;
+    }
+
+    public Document updateDocument(DocumentDTO documentDTO, String header) {
+        Document document = documentDTOToDocument.toDocument(documentDTO);
+        return documentService.updateDocument(document,header);
     }
 }

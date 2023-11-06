@@ -10,7 +10,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +26,7 @@ public class ProductService {
         User user = userRepository.findByLogin(jwtService.extractUsername(header)).orElseThrow();
         product.setAuthor(user);
         product.setActive(true);
+        product.setAccessibility(false);
         Product productDb = productRepository.saveAndFlush(product);
         return new ProductResponse(productDb.getId());
     }
@@ -42,24 +45,28 @@ public class ProductService {
        User user = userRepository.findByLogin(jwtService.extractUsername(header)).orElseThrow();
        product.setAuthor(user);
        product.setId(null);
-        product.setActive(true);
+       product.setActive(true);
        return productRepository.saveAndFlush(product);
     }
 
     public List<Product> findBySearch(String search, Boolean active){
-        List<Product> products = new ArrayList<>();
+        Set<Product> products = new HashSet<>();
         if (active != null){
-            System.out.println(active);
-            userRepository.findByLogin(search).ifPresent(value->{
-                products.addAll(productRepository.findByAuthorAndActive(value,active));
-            });
-            products.addAll(productRepository.findByActiveAndNameContainingIgnoreCaseOrCategoryContainingIgnoreCase(active,search,search));
+            if (search.isEmpty()){
+                products.addAll(productRepository.findByActive(active));
+            }else {
+                userRepository.findByLogin(search).ifPresent(value -> {
+                    products.addAll(productRepository.findByAuthorAndActive(value, active));
+                });
+                products.addAll(productRepository.findByActiveAndNameContainingIgnoreCaseOrCategoryContainingIgnoreCase(active,search,search));
+            }
         }else {
             userRepository.findByLogin(search).ifPresent(value->{
                 products.addAll(productRepository.findByAuthor(value));
             });
             products.addAll(productRepository.findByNameContainingIgnoreCaseOrCategoryContainingIgnoreCase(search,search));
         }
-        return products;
+        products.forEach(System.out::println);
+        return products.stream().toList();
     }
 }
